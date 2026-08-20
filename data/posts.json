@@ -4,49 +4,49 @@
     {
       "id": "uber",
       "name": "Uber",
-      "color": "#0E8F5E",
+      "color": "#6A93D5",
       "site": "https://www.uber.com/blog/engineering/"
     },
     {
       "id": "swiggy",
       "name": "Swiggy",
-      "color": "#E2701A",
+      "color": "#D17D3E",
       "site": "https://bytes.swiggy.com/"
     },
     {
       "id": "aws",
       "name": "AWS",
-      "color": "#D98218",
+      "color": "#00AD8F",
       "site": "https://aws.amazon.com/blogs/architecture/"
     },
     {
       "id": "netflix",
       "name": "Netflix",
-      "color": "#D6252F",
+      "color": "#C08800",
       "site": "https://netflixtechblog.com/"
     },
     {
       "id": "airbnb",
       "name": "Airbnb",
-      "color": "#E0484D",
+      "color": "#C56F99",
       "site": "https://medium.com/airbnb-engineering"
     },
     {
       "id": "stripe",
       "name": "Stripe",
-      "color": "#6E63E8",
+      "color": "#38A065",
       "site": "https://stripe.com/blog"
     },
     {
       "id": "meta",
       "name": "Meta",
-      "color": "#2673E6",
+      "color": "#9577C7",
       "site": "https://engineering.fb.com/"
     },
     {
       "id": "spotify",
       "name": "Spotify",
-      "color": "#1A9E4B",
+      "color": "#CC6660",
       "site": "https://engineering.atspotify.com/"
     }
   ],

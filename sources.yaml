@@ -4,7 +4,11 @@
 #
 #   id:     short slug, used internally (lowercase, no spaces)
 #   name:   display name shown on the chip and card
-#   color:  accent dot colour (hex)
+#   color:  accent dot colour (hex) — pick a soft/pastel tone that reads
+#           against the dark theme, not the blog's literal (often
+#           saturated) brand color: OKLCH lightness ~0.58-0.67, chroma
+#           ~0.10-0.15. If adding several sources at once, validate
+#           distinguishability with the dataviz skill's palette script.
 #   site:   human-facing blog homepage, linked in the footer
 #   type:   "rss"    -> parse `feed` with feedparser (the normal case)
 #           "scrape" -> no usable feed exists; use a custom scraper in
@@ -19,13 +23,13 @@
 sources:
   - id: uber
     name: Uber
-    color: "#0E8F5E"
+    color: "#6A93D5"
     site: https://www.uber.com/blog/engineering/
     type: scrape          # Uber has no public RSS feed; see scrapers.py
 
   - id: swiggy
     name: Swiggy
-    color: "#E2701A"
+    color: "#D17D3E"
     site: https://bytes.swiggy.com/
     type: rss
     feed: https://swiggybytes.medium.com/feed
@@ -34,28 +38,28 @@ sources:
 
   - id: aws
     name: AWS
-    color: "#D98218"
+    color: "#00AD8F"
     site: https://aws.amazon.com/blogs/architecture/
     type: rss
     feed: https://aws.amazon.com/blogs/architecture/feed/
 
   - id: netflix
     name: Netflix
-    color: "#D6252F"
+    color: "#C08800"
     site: https://netflixtechblog.com/
     type: rss
     feed: https://netflixtechblog.com/feed
 
   - id: airbnb
     name: Airbnb
-    color: "#E0484D"
+    color: "#C56F99"
     site: https://medium.com/airbnb-engineering
     type: rss
     feed: https://medium.com/feed/airbnb-engineering
 
   - id: stripe
     name: Stripe
-    color: "#6E63E8"
+    color: "#38A065"
     site: https://stripe.com/blog
     type: rss
     feed: https://stripe.com/blog/feed.rss
@@ -64,14 +68,14 @@ sources:
 
   - id: meta
     name: Meta
-    color: "#2673E6"
+    color: "#9577C7"
     site: https://engineering.fb.com/
     type: rss
     feed: https://engineering.fb.com/feed/
 
   - id: spotify
     name: Spotify
-    color: "#1A9E4B"
+    color: "#CC6660"
     site: https://engineering.atspotify.com/
     type: rss
     feed: https://engineering.atspotify.com/feed/
@@ -82,42 +86,42 @@ sources:
 #
 #  - id: cloudflare
 #    name: Cloudflare
-#    color: "#E8871A"
+#    color: "#889D37"
 #    site: https://blog.cloudflare.com/
 #    type: rss
 #    feed: https://blog.cloudflare.com/rss/
 #
 #  - id: discord
 #    name: Discord
-#    color: "#5865F2"
+#    color: "#0999B2"
 #    site: https://discord.com/category/engineering
 #    type: rss
 #    feed: https://discord.com/blog/rss.xml
 #
 #  - id: github
 #    name: GitHub
-#    color: "#8250DF"
+#    color: "#AF6297"
 #    site: https://github.blog/engineering/
 #    type: rss
 #    feed: https://github.blog/engineering/feed/
 #
 #  - id: dropbox
 #    name: Dropbox
-#    color: "#0061FF"
+#    color: "#4494C8"
 #    site: https://dropbox.tech/
 #    type: rss
 #    feed: https://dropbox.tech/feed
 #
 #  - id: pinterest
 #    name: Pinterest
-#    color: "#BD081C"
+#    color: "#C04D6E"
 #    site: https://medium.com/pinterest-engineering
 #    type: rss
 #    feed: https://medium.com/feed/pinterest-engineering
 #
 #  - id: doordash
 #    name: DoorDash
-#    color: "#EB1700"
+#    color: "#CB6440"
 #    site: https://careersatdoordash.com/engineering-blog/
 #    type: rss
 #    feed: https://careersatdoordash.com/engineering-blog/feed/

@@ -6,18 +6,20 @@
 <title>Engineering Blogs — Latest</title>
 <style>
   :root{
-    --bg:#0c0e13; --panel:#13161e; --card:#161a23; --card-h:#1b2029;
-    --line:#242a36; --line-soft:#1c212c;
-    --tx:#e9ebf1; --tx2:#98a0b3; --tx3:#646c80;
-    --acc:#6b93ff; --acc-bg:rgba(107,147,255,.13);
+    --bg:#17151f; --panel:#1d1a28; --card:#201d2c; --card-h:#251f34;
+    --line:#332c46; --line-soft:#28223a;
+    --tx:#ece8f5; --tx2:#a89fc0; --tx3:#746d8c;
+    --acc:#c9a8f0; --acc-bg:rgba(201,168,240,.14);
+    --warn:#dba05c; --warn-tx:#3a2410;
     --r:14px;
   }
   @media (prefers-color-scheme:light){
     :root{
-      --bg:#f6f7fa; --panel:#fff; --card:#fff; --card-h:#fbfbfd;
-      --line:#e4e6ee; --line-soft:#eceef4;
-      --tx:#171a24; --tx2:#5a6076; --tx3:#8c92a6;
-      --acc:#3760dd; --acc-bg:rgba(55,96,221,.08);
+      --bg:#faf8fc; --panel:#fff; --card:#fff; --card-h:#f7f3fb;
+      --line:#e6e0f0; --line-soft:#eee9f6;
+      --tx:#211d2c; --tx2:#635c78; --tx3:#8f88a3;
+      --acc:#7c5cc9; --acc-bg:rgba(124,92,201,.08);
+      --warn:#c9803a; --warn-tx:#fff;
     }
   }
   *{box-sizing:border-box}
@@ -44,7 +46,7 @@
   .chip:hover{color:var(--tx)}
   .chip .n{font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums}
   .chip .warn{display:inline-flex;align-items:center;justify-content:center;
-    width:13px;height:13px;border-radius:50%;background:#c9803a;color:#fff;
+    width:13px;height:13px;border-radius:50%;background:var(--warn);color:var(--warn-tx);
     font-size:9.5px;font-weight:700;cursor:help}
   .row2{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
   input.q{flex:1;min-width:190px;background:var(--panel);border:1px solid var(--line);
@@ -79,8 +81,8 @@
 
   .reader{position:fixed;inset:0;z-index:100;display:none}
   .reader.open{display:block}
-  .reader-backdrop{position:absolute;inset:0;background:rgba(4,6,10,.6)}
-  @media (prefers-color-scheme:light){.reader-backdrop{background:rgba(20,22,30,.4)}}
+  .reader-backdrop{position:absolute;inset:0;background:rgba(10,8,15,.65)}
+  @media (prefers-color-scheme:light){.reader-backdrop{background:rgba(30,22,40,.35)}}
   .reader-panel{position:relative;margin:0 auto;max-width:720px;height:100%;
     background:var(--panel);display:flex;flex-direction:column;
     box-shadow:0 0 60px rgba(0,0,0,.35)}
