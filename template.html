@@ -83,10 +83,13 @@
   .card .ext{color:var(--tx3);font-size:11px;margin-left:4px}
   .card.read{opacity:.5}
   .card.read:hover{opacity:.85}
-  .read-dot{width:9px;height:9px;border-radius:50%;flex:none;margin-left:auto;
-    border:1.5px solid var(--tx3);cursor:pointer}
-  .read-dot:hover{border-color:var(--acc)}
-  .read-dot.unread{background:var(--acc);border-color:var(--acc)}
+  .card-foot{display:flex;justify-content:flex-end;margin-top:11px}
+  .mark-read-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
+    padding:8px 15px;border-radius:999px;border:1px solid var(--line);color:var(--tx2);
+    cursor:pointer;user-select:none;white-space:nowrap;
+    transition:border-color .14s,color .14s,background .14s}
+  .mark-read-btn:hover{border-color:var(--acc);color:var(--tx)}
+  .mark-read-btn.is-read{border-color:var(--line-soft);color:var(--acc);background:var(--acc-bg)}
 
   .reader{position:fixed;inset:0;z-index:100;display:none}
   .reader.open{display:block}
@@ -278,10 +281,11 @@ function render(){
     const summary = i.summary ? `<p>${hl(i.summary,q)}</p>` : '';
     const ext = i.content ? '' : `<span class="ext">↗ opens original</span>`;
     const isRead = readSet.has(i.url);
-    const dotTitle = isRead ? 'Mark unread' : 'Mark read';
+    const btnLabel = isRead ? '✓ Read' : 'Mark as read';
     html += `<a class="card${isRead?' read':''}" href="${esc(i.url)}" target="_blank" rel="noopener">
-      <div class="ct"><span class="src"><span class="dot" style="background:${s.color}"></span>${esc(s.name)}</span><span class="dt">${fmtDate(i.date)}</span>${ext}<span class="read-dot${isRead?'':' unread'}" title="${dotTitle}"></span></div>
-      <h3>${hl(i.title,q)}</h3>${summary}</a>`;
+      <div class="ct"><span class="src"><span class="dot" style="background:${s.color}"></span>${esc(s.name)}</span><span class="dt">${fmtDate(i.date)}</span>${ext}</div>
+      <h3>${hl(i.title,q)}</h3>${summary}
+      <div class="card-foot"><span class="mark-read-btn${isRead?' is-read':''}">${btnLabel}</span></div></a>`;
   });
   if(last) html += `</div>`;
   feed.innerHTML = html;
@@ -350,8 +354,8 @@ document.getElementById('feed').addEventListener('click', e=>{
   if(!card) return;
   const url = card.getAttribute('href');
 
-  const dot = e.target.closest('.read-dot');
-  if(dot){
+  const btn = e.target.closest('.mark-read-btn');
+  if(btn){
     e.preventDefault();
     readSet.has(url) ? markUnread(url) : markRead(url);
     return;
