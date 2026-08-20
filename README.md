@@ -1,5 +1,7 @@
 # Engineering Blogs Feed
 
+**Live: [divyanshu0x16.github.io/engineering-blogs-feed](https://divyanshu0x16.github.io/engineering-blogs-feed/)**
+
 One page with the latest posts from the engineering blogs worth reading —
 Uber, AWS, Netflix, Airbnb, Meta, Spotify, Stripe and Swiggy. Filter by
 company, search across titles and summaries, grouped by month. Posts open
@@ -9,6 +11,11 @@ back to the original site otherwise.
 No server, no database, no JavaScript framework. A Python script pulls the
 feeds, a template renders them into a single self-contained `index.html`, and
 GitHub Actions rebuilds it every morning.
+
+<p>
+  <img src="screenshots/feed.png" alt="The feed, grouped by month with source filter chips" width="49%">
+  <img src="screenshots/reading-mode.png" alt="A post open in the in-page reading mode" width="49%">
+</p>
 
 ## Quick start
 
@@ -54,7 +61,8 @@ Blogs with no RSS feed need `type: scrape` plus a function in
 
 `.github/workflows/build.yml` then rebuilds daily at 06:00 UTC (11:30 IST),
 on every push to `main`, and on demand from the Actions tab. Your feed lives
-at `https://<username>.github.io/<repo>/`.
+at `https://<username>.github.io/<repo>/` — see the live link at the top of
+this README for this repo's own deployment.
 
 To change the schedule, edit the `cron` line in that workflow.
 
