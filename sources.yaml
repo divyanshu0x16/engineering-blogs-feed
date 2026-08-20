@@ -1,0 +1,123 @@
+# Engineering blog sources.
+#
+# Add a new blog by appending an entry here — nothing else needs to change.
+#
+#   id:     short slug, used internally (lowercase, no spaces)
+#   name:   display name shown on the chip and card
+#   color:  accent dot colour (hex)
+#   site:   human-facing blog homepage, linked in the footer
+#   type:   "rss"    -> parse `feed` with feedparser (the normal case)
+#           "scrape" -> no usable feed exists; use a custom scraper in
+#                       scripts/scrapers.py registered under this id
+#   feed:   feed URL (required when type is rss)
+#
+# Tip: to find a blog's feed, view source on its homepage and look for
+#   <link rel="alternate" type="application/rss+xml" href="...">
+# Common paths worth trying: /feed, /rss, /feed.xml, /rss.xml, /atom.xml
+# Medium publications: https://medium.com/feed/<publication-name>
+
+sources:
+  - id: uber
+    name: Uber
+    color: "#0E8F5E"
+    site: https://www.uber.com/blog/engineering/
+    type: scrape          # Uber has no public RSS feed; see scrapers.py
+
+  - id: swiggy
+    name: Swiggy
+    color: "#E2701A"
+    site: https://bytes.swiggy.com/
+    type: rss
+    feed: https://swiggybytes.medium.com/feed
+    # NOTE: this publication has been dormant since mid-2024 and skews
+    # toward career profiles rather than engineering. Candidate for removal.
+
+  - id: aws
+    name: AWS
+    color: "#D98218"
+    site: https://aws.amazon.com/blogs/architecture/
+    type: rss
+    feed: https://aws.amazon.com/blogs/architecture/feed/
+
+  - id: netflix
+    name: Netflix
+    color: "#D6252F"
+    site: https://netflixtechblog.com/
+    type: rss
+    feed: https://netflixtechblog.com/feed
+
+  - id: airbnb
+    name: Airbnb
+    color: "#E0484D"
+    site: https://medium.com/airbnb-engineering
+    type: rss
+    feed: https://medium.com/feed/airbnb-engineering
+
+  - id: stripe
+    name: Stripe
+    color: "#6E63E8"
+    site: https://stripe.com/blog
+    type: rss
+    feed: https://stripe.com/blog/feed.rss
+    # NOTE: Stripe publishes no engineering-only feed, so this mixes in
+    # product and business posts. Consider filtering by keyword.
+
+  - id: meta
+    name: Meta
+    color: "#2673E6"
+    site: https://engineering.fb.com/
+    type: rss
+    feed: https://engineering.fb.com/feed/
+
+  - id: spotify
+    name: Spotify
+    color: "#1A9E4B"
+    site: https://engineering.atspotify.com/
+    type: rss
+    feed: https://engineering.atspotify.com/feed/
+
+# ---------------------------------------------------------------------------
+# Suggested additions — uncomment to enable. All verified to publish RSS.
+# ---------------------------------------------------------------------------
+#
+#  - id: cloudflare
+#    name: Cloudflare
+#    color: "#E8871A"
+#    site: https://blog.cloudflare.com/
+#    type: rss
+#    feed: https://blog.cloudflare.com/rss/
+#
+#  - id: discord
+#    name: Discord
+#    color: "#5865F2"
+#    site: https://discord.com/category/engineering
+#    type: rss
+#    feed: https://discord.com/blog/rss.xml
+#
+#  - id: github
+#    name: GitHub
+#    color: "#8250DF"
+#    site: https://github.blog/engineering/
+#    type: rss
+#    feed: https://github.blog/engineering/feed/
+#
+#  - id: dropbox
+#    name: Dropbox
+#    color: "#0061FF"
+#    site: https://dropbox.tech/
+#    type: rss
+#    feed: https://dropbox.tech/feed
+#
+#  - id: pinterest
+#    name: Pinterest
+#    color: "#BD081C"
+#    site: https://medium.com/pinterest-engineering
+#    type: rss
+#    feed: https://medium.com/feed/pinterest-engineering
+#
+#  - id: doordash
+#    name: DoorDash
+#    color: "#EB1700"
+#    site: https://careersatdoordash.com/engineering-blog/
+#    type: rss
+#    feed: https://careersatdoordash.com/engineering-blog/feed/
