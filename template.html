@@ -56,6 +56,9 @@
   .mini{background:none;border:1px solid transparent;color:var(--tx3);font-size:12.5px;
     cursor:pointer;padding:8px 10px;border-radius:8px;font-family:inherit;white-space:nowrap}
   .mini:hover{color:var(--tx);border-color:var(--line)}
+  .mini.on{color:var(--tx);border-color:var(--acc);background:var(--acc-bg)}
+  .mini.sync-on{color:var(--acc)}
+  .mini.sync-err{color:var(--warn)}
 
   .count{font-size:12px;color:var(--tx3);margin:16px 0 12px;font-variant-numeric:tabular-nums}
 
@@ -78,6 +81,12 @@
   mark{background:var(--acc-bg);color:var(--tx);border-radius:3px;padding:0 2px}
 
   .card .ext{color:var(--tx3);font-size:11px;margin-left:4px}
+  .card.read{opacity:.5}
+  .card.read:hover{opacity:.85}
+  .read-dot{width:9px;height:9px;border-radius:50%;flex:none;margin-left:auto;
+    border:1.5px solid var(--tx3);cursor:pointer}
+  .read-dot:hover{border-color:var(--acc)}
+  .read-dot.unread{background:var(--acc);border-color:var(--acc)}
 
   .reader{position:fixed;inset:0;z-index:100;display:none}
   .reader.open{display:block}
@@ -133,6 +142,8 @@
       <input class="q" id="q" type="text" placeholder="Search titles and summaries…" autocomplete="off">
       <button class="mini" id="all">All</button>
       <button class="mini" id="none">None</button>
+      <button class="mini" id="unread-toggle" title="Show only posts you haven't marked read">Unread only</button>
+      <button class="mini" id="sync-btn" title="Sync read state across devices via a private GitHub gist">Sync</button>
     </div>
   </div>
 
@@ -174,6 +185,35 @@ const ITEMS = DATA.posts;
 const ERRORS = DATA.errors || {};
 const SMAP = Object.fromEntries(SOURCES.map(s=>[s.id,s]));
 let active = new Set(SOURCES.map(s=>s.id));
+let unreadOnly = false;
+
+// Read-state: tracked locally in this browser, optionally synced across
+// devices via a private GitHub gist (see initSync below). The gist is the
+// only external request this page ever makes, and only once a token is
+// supplied — everything else stays fully offline/self-contained.
+const LS_STATE = 'ebf_read_state_v1';
+const LS_SYNC = 'ebf_sync_v1';
+const GIST_FILENAME = 'engineering-blogs-feed-state.json';
+
+function loadLocalState(){
+  try{ return JSON.parse(localStorage.getItem(LS_STATE)) || {read:[]}; }
+  catch(_){ return {read:[]}; }
+}
+function saveLocalState(state){
+  try{ localStorage.setItem(LS_STATE, JSON.stringify(state)); }catch(_){}
+}
+function loadSyncConfig(){
+  try{ return JSON.parse(localStorage.getItem(LS_SYNC)); }
+  catch(_){ return null; }
+}
+function saveSyncConfig(cfg){
+  try{
+    cfg ? localStorage.setItem(LS_SYNC, JSON.stringify(cfg)) : localStorage.removeItem(LS_SYNC);
+  }catch(_){}
+}
+
+let readSet = new Set(loadLocalState().read || []);
+let syncConfig = loadSyncConfig();
 
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -219,6 +259,7 @@ function render(){
   const q = document.getElementById('q').value.trim().toLowerCase();
   const feed = document.getElementById('feed');
   const list = ITEMS.filter(i => active.has(i.source) &&
+    (!unreadOnly || !readSet.has(i.url)) &&
     (!q || i.title.toLowerCase().includes(q) || (i.summary||'').toLowerCase().includes(q)));
 
   document.getElementById('count').textContent =
@@ -236,12 +277,43 @@ function render(){
     const s = SMAP[i.source];
     const summary = i.summary ? `<p>${hl(i.summary,q)}</p>` : '';
     const ext = i.content ? '' : `<span class="ext">↗ opens original</span>`;
-    html += `<a class="card" href="${esc(i.url)}" target="_blank" rel="noopener">
-      <div class="ct"><span class="src"><span class="dot" style="background:${s.color}"></span>${esc(s.name)}</span><span class="dt">${fmtDate(i.date)}</span>${ext}</div>
+    const isRead = readSet.has(i.url);
+    const dotTitle = isRead ? 'Mark unread' : 'Mark read';
+    html += `<a class="card${isRead?' read':''}" href="${esc(i.url)}" target="_blank" rel="noopener">
+      <div class="ct"><span class="src"><span class="dot" style="background:${s.color}"></span>${esc(s.name)}</span><span class="dt">${fmtDate(i.date)}</span>${ext}<span class="read-dot${isRead?'':' unread'}" title="${dotTitle}"></span></div>
       <h3>${hl(i.title,q)}</h3>${summary}</a>`;
   });
   if(last) html += `</div>`;
   feed.innerHTML = html;
+}
+
+function markRead(url){
+  if(readSet.has(url)) return;
+  readSet.add(url);
+  persistReadState();
+  render();
+}
+function markUnread(url){
+  if(!readSet.has(url)) return;
+  readSet.delete(url);
+  persistReadState();
+  render();
+}
+let saveTimer = null;
+function persistReadState(){
+  const state = { read: Array.from(readSet) };
+  saveLocalState(state);
+  if(!syncConfig || !syncConfig.token || !syncConfig.gistId) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{
+      setSyncStatus('syncing');
+      await saveGistState(syncConfig.token, syncConfig.gistId, state);
+      setSyncStatus('synced');
+    }catch(err){
+      setSyncStatus('error', err.message);
+    }
+  }, 1200);
 }
 
 // Reading mode: cards with extracted content open in-page instead of
@@ -274,14 +346,30 @@ function closeReader(){
   document.body.style.overflow = '';
 }
 document.getElementById('feed').addEventListener('click', e=>{
-  if(e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
   const card = e.target.closest('.card');
   if(!card) return;
-  const post = ITEMS.find(p => p.url === card.getAttribute('href'));
+  const url = card.getAttribute('href');
+
+  const dot = e.target.closest('.read-dot');
+  if(dot){
+    e.preventDefault();
+    readSet.has(url) ? markUnread(url) : markRead(url);
+    return;
+  }
+
+  markRead(url);
+
+  if(e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const post = ITEMS.find(p => p.url === url);
   if(post && post.content){
     e.preventDefault();
     openReader(post);
   }
+});
+document.getElementById('feed').addEventListener('auxclick', e=>{
+  if(e.button !== 1) return;
+  const card = e.target.closest('.card');
+  if(card) markRead(card.getAttribute('href'));
 });
 document.getElementById('reader-close').onclick = closeReader;
 document.getElementById('reader-backdrop').onclick = closeReader;
@@ -294,6 +382,106 @@ document.getElementById('all').onclick = ()=>{ active=new Set(SOURCES.map(s=>s.i
   document.querySelectorAll('.chip').forEach(c=>c.classList.add('on')); render(); };
 document.getElementById('none').onclick = ()=>{ active=new Set();
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); render(); };
+document.getElementById('unread-toggle').onclick = e=>{
+  unreadOnly = !unreadOnly;
+  e.target.classList.toggle('on', unreadOnly);
+  render();
+};
+
+// Optional cross-device sync: read state lives in a private GitHub gist,
+// found or created by filename so a second device only needs the same
+// token pasted in — no gist ID to copy around. Entirely opt-in; with no
+// token this page never makes an external request.
+const syncBtn = document.getElementById('sync-btn');
+function setSyncStatus(status, detail){
+  const labels = {off:'Sync', syncing:'Syncing…', synced:'Synced ✓', error:'Sync error ⚠'};
+  syncBtn.textContent = labels[status] || 'Sync';
+  syncBtn.classList.toggle('sync-on', status === 'synced');
+  syncBtn.classList.toggle('sync-err', status === 'error');
+  syncBtn.title = status === 'error' && detail
+    ? `Sync error: ${detail}`
+    : 'Sync read state across devices via a private GitHub gist';
+}
+async function ghFetch(url, token, opts){
+  const res = await fetch(url, {...opts, headers:{
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/vnd.github+json',
+    ...(opts && opts.headers),
+  }});
+  if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res.json();
+}
+async function findOrCreateGist(token){
+  for(let page = 1; page <= 5; page++){
+    const gists = await ghFetch(`https://api.github.com/gists?per_page=100&page=${page}`, token);
+    const found = gists.find(g => g.files && g.files[GIST_FILENAME]);
+    if(found) return found.id;
+    if(gists.length < 100) break;
+  }
+  const created = await ghFetch('https://api.github.com/gists', token, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      description: 'Engineering Blogs Feed — read state (personal sync, do not edit manually)',
+      public: false,
+      files: { [GIST_FILENAME]: { content: JSON.stringify({read:[]}) } },
+    }),
+  });
+  return created.id;
+}
+async function fetchGistState(token, gistId){
+  const gist = await ghFetch(`https://api.github.com/gists/${gistId}`, token);
+  const file = gist.files[GIST_FILENAME];
+  if(!file) throw new Error('gist missing state file');
+  return JSON.parse(file.content);
+}
+async function saveGistState(token, gistId, state){
+  await ghFetch(`https://api.github.com/gists/${gistId}`, token, {
+    method: 'PATCH',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ files: { [GIST_FILENAME]: { content: JSON.stringify(state) } } }),
+  });
+}
+async function initSync(){
+  if(!syncConfig || !syncConfig.token){ setSyncStatus('off'); return; }
+  setSyncStatus('syncing');
+  try{
+    if(!syncConfig.gistId){
+      syncConfig.gistId = await findOrCreateGist(syncConfig.token);
+      saveSyncConfig(syncConfig);
+    }
+    const remote = await fetchGistState(syncConfig.token, syncConfig.gistId);
+    const merged = { read: Array.from(new Set([...(remote.read||[]), ...readSet])) };
+    readSet = new Set(merged.read);
+    saveLocalState(merged);
+    render();
+    await saveGistState(syncConfig.token, syncConfig.gistId, merged);
+    setSyncStatus('synced');
+  }catch(err){
+    setSyncStatus('error', err.message);
+  }
+}
+syncBtn.onclick = async ()=>{
+  if(syncConfig && syncConfig.token){
+    if(confirm('Disconnect GitHub sync on this device? Your read state stays saved in the gist and locally here — this only stops syncing.')){
+      syncConfig = null;
+      saveSyncConfig(null);
+      setSyncStatus('off');
+    }
+    return;
+  }
+  const token = prompt(
+    'Paste a GitHub personal access token with only the "gist" scope.\n' +
+    'Create one at github.com/settings/tokens (classic) → check just "gist".\n\n' +
+    "It's stored only in this browser's localStorage and only ever talks to api.github.com."
+  );
+  if(!token) return;
+  syncConfig = { token: token.trim(), gistId: null };
+  saveSyncConfig(syncConfig);
+  await initSync();
+};
+setSyncStatus(syncConfig && syncConfig.token ? 'syncing' : 'off');
+if(syncConfig && syncConfig.token) initSync();
 
 // Rendered client-side so the timestamp shows in the reader's own timezone.
 (function(){

@@ -52,6 +52,21 @@ bottom of that file, ready to uncomment.
 Blogs with no RSS feed need `type: scrape` plus a function in
 `scripts/scrapers.py` — see `scrape_uber()` for the pattern.
 
+## Syncing read state across devices
+
+Clicking a post (or its dot) marks it read; **Unread only** filters down to
+what's left. This is tracked in `localStorage`, so by default it's per
+browser/device and won't follow you from laptop to phone.
+
+To sync it: click **Sync**, paste a GitHub [personal access token
+(classic)](https://github.com/settings/tokens) with only the **`gist`**
+scope checked. The page finds or creates a private gist named
+`engineering-blogs-feed-state.json` under your account and keeps it in
+sync. On a second device, click **Sync** and paste the *same* token — no
+gist ID to copy around. This is the one feature that makes a network
+request from the page itself; skip it and everything else still works
+fully offline.
+
 ## Deploying to GitHub Pages
 
 1. Push this repo to GitHub.

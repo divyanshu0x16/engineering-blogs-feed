@@ -72,11 +72,27 @@ single dead feed should never break the site.
 introduce a template engine; if you need more logic, put it in the page's own
 JavaScript, which already has the full dataset in `DATA`.
 
-**No external requests from `index.html`.** All CSS and JS are inline. The
-page must work offline and from a `file://` URL. Don't add CDN links, web
-fonts, or analytics. This is also why reading-mode content has no `<img>`
-tags — `extract.py` strips images during sanitization rather than embedding
-remote `src` URLs that would try to load at view time.
+**No external requests from `index.html`, with one opt-in exception.** All
+CSS and JS are inline; the page must work offline and from a `file://` URL by
+default. Don't add CDN links, web fonts, or analytics. This is also why
+reading-mode content has no `<img>` tags — `extract.py` strips images during
+sanitization rather than embedding remote `src` URLs that would try to load
+at view time. The one deliberate exception is read-state sync (below): it
+only fires once a user pastes a GitHub token, and the page works fully
+offline without one.
+
+**Read/unread state, synced via a private GitHub gist.** Read-state (a set
+of post URLs) lives in `localStorage` under `ebf_read_state_v1`, always
+local-first. If the user connects sync (`ebf_sync_v1` holds `{token,
+gistId}`), the page finds-or-creates a private gist named
+`engineering-blogs-feed-state.json` under their account and merges/pushes
+that same set to it, so a second device just needs the same token pasted
+in — no gist ID to copy around. This is the one place the page talks to a
+network API from the browser; it requires a classic PAT with only the
+`gist` scope, entered via a `prompt()` and never sent anywhere but
+`api.github.com`. Keep this feature's failure modes non-fatal, same spirit
+as source fetch errors — a sync error shouldn't block reading or marking
+posts locally.
 
 ## Adding a blog
 
@@ -114,10 +130,10 @@ These are real and worth fixing — treat them as the natural first tasks:
 
 Roughly in order of value-per-effort:
 
-- Read/unread state and bookmarks in `localStorage`
+- Bookmarks/starring, alongside the read/unread state that already exists
 - Keyword filters per source (would fix the Stripe noise problem)
 - Full-text search across fetched post bodies, not just titles and summaries
-- An "only show posts since my last visit" mode
+  — the data (`content`) is already there from reading-mode extraction
 - Tag inference from titles (ML, infra, databases, frontend) for cross-cutting
   filters
 - An RSS/Atom feed *output*, so the aggregator can be read in a real feed reader
