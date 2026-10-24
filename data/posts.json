@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-23T10:36:15+00:00",
+  "generated_at": "2026-10-24T09:54:04+00:00",
   "sources": [
     {
       "id": "uber",
@@ -54,6 +54,14 @@
     "uber": "HTTPError: 406 Client Error: Not Acceptable for url: https://www.uber.com/IN/en/blog/engineering/"
   },
   "posts": [
+    {
+      "title": "Beyond API Compatibility: Building a Tool to Measure the Blast Radius of Library Changes",
+      "url": "https://netflixtechblog.com/beyond-api-compatibility-building-a-tool-to-measure-the-blast-radius-of-library-changes-9474f2fd4f90",
+      "date": "2026-10-23",
+      "summary": "By Roberto Perez Alcolea , Java Platform Team Quasar connects a proposed API change with observed references in consumer repositories, giving the producer evidence for a release decision At Netflix, shared Java…",
+      "source": "netflix",
+      "content": ""
+    },
     {
       "title": "Single-tenant Titus: VM-level isolation on a multi-tenant container platform",
       "url": "https://netflixtechblog.com/single-tenant-titus-vm-level-isolation-on-a-multi-tenant-container-platform-6d8b1909d163",
@@ -243,14 +251,6 @@
       "url": "https://netflixtechblog.com/running-apache-spark-experiments-in-my-sleep-and-on-a-plane-588816b6b5f8",
       "date": "2026-10-14",
       "summary": "By Prashanth Gedde Narayanaswamy As one of Netflix’s largest and critical data pipelines, member-sessionizer consolidates tens of billions of hourly client events, encompassing user taps, playbacks, and engagement…",
-      "source": "netflix",
-      "content": ""
-    },
-    {
-      "title": "The Lifecycle of LLM-as-a-Judge: Building, Aligning, and Monitoring at scale",
-      "url": "https://netflixtechblog.com/the-lifecycle-of-llm-as-a-judge-building-aligning-and-monitoring-at-scale-c95bd8283508",
-      "date": "2026-10-14",
-      "summary": "By Emma Yanyang Kong , JJ Tan , Ishan Gupta , Lars Olds , Claire Campbell , David Fagnan , Ratna Kavuri , Rohan Gosain , Veli Balin , Minsu Jang , Louis Garcia Introduction Any team generating text with an LLM at scale…",
       "source": "netflix",
       "content": ""
     },
